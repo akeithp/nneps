@@ -24,7 +24,7 @@ using namespace std;
 //#define NTHREADS 4
 
 uint NTHREADS;	// number of threads
-ulong REPET = 10;
+ulong REPET = 1;
 
 float xup1, xup2, xle2, xle3, xlo3, xlo4, xri4, xri1;
 float yup1, yup2, yle2, yle3, ylo3, ylo4, yri4, yri1;
@@ -140,7 +140,7 @@ int main(int argc, char const *argv[]){
 		//t = (clock() - t)/CLOCKS_PER_SEC;	// seconds
 		//cout << "Serial Time = " << t/REPET << " Seconds" << endl;
 		if(PRINT){
-			cout << "Average CPU time per execution, Secuential = " << avgTime << endl; //revisar unidad tiempos
+			cout << "Average CPU time per execution, Sequential = " << avgTime*1000000.0 << " Microseconds" << endl; //revisar unidad tiempos
 			//cout << "Primary Extreme Points: UP(" << xup << "," << yup << ")" << "; DOWN(" << xdown << "," << ydown <<"); LEFT(" << xleft << "," << yleft << "); RIGHT(" << xright << "," << yright << ")" << endl;
 			//cout << "Secondary Extreme Points: RIGHT_UP(" << xri_up <<"," << yri_up << "); UP_LEFT(" << xup_le << "," << yup_le << "); LEFT_DOWN(" << xle_do << "," << yle_do << "); DOWN_RIGHT(" << xdo_ri << "," << ydo_ri << ")" << endl;
 		}
@@ -171,7 +171,7 @@ int main(int argc, char const *argv[]){
 		t2=omp_get_wtime();
 		avgTime = (t2 - t1)/REPET;
 		if(PRINT){
-			cout << "Average CPU time per execution, Parallel = " << avgTime << endl;
+			cout << "Average CPU time per execution, Parallel = " << avgTime*1000000.0 << " Microseconds" << endl;
 			//cout << "Primary Extreme Points: UP(" << xup << "," << yup << ")" << "; DOWN(" << xdown << "," << ydown <<"); LEFT(" << xleft << "," << yleft << "); RIGHT(" << xright << "," << yright << ")" << endl;
 			//cout << "Secondary Extreme Points: RIGHT_UP(" << xri_up <<"," << yri_up << "); UP_LEFT(" << xup_le << "," << yup_le << "); LEFT_DOWN(" << xle_do << "," << yle_do << "); DOWN_RIGHT(" << xdo_ri << "," << ydo_ri << ")" << endl;
 		}
@@ -440,7 +440,6 @@ void runEPS(pointSet *points){
 			}
 		}
 	}
-	cout << "Serial: " << yri4 << endl;
 }
 
 /** 
@@ -467,8 +466,6 @@ void runEPSPDAC(pointSet *points){
 		ulong i;
 		float xi,yi;
 		bool seei=true;
-		//float my_min;
-		//float my_max;
 		step = (int)points->n/omp_get_num_threads();
 		id = omp_get_thread_num();
 		start = id * step;
@@ -482,7 +479,7 @@ void runEPSPDAC(pointSet *points){
 		xri1p[id] = xup1p[id] = xup2p[id] = xle2p[id] = xle3p[id] = xlo3p[id] = xlo4p[id] = xri4p[id] = points->X[start];
 		yri1p[id] = yup1p[id] = yup2p[id] = yle2p[id] = yle3p[id] = ylo3p[id] = ylo4p[id] = yri4p[id] = points->Y[start];
 		ri1p[id] = up1p[id] = up2p[id] = le2p[id] = le3p[id] = lo3p[id] = lo4p[id] = ri4p[id] = 0;
-		#pragma omp parallel for private(i, seei) shared(c1p,c2p,c3p,c4p,xc1p,xc4p,yc1p,yc2p,xc2p,xc3p,yc3p,yc4p,xri1p,xup1p,xup2p,xle2p,xle3p,xlo3p,xlo4p,xri4p,yri1p,yup1p,yup2p,yle2p,yle3p,ylo3p,ylo4p,yri4p,ri1p,up1p,up2p,le2p,le3p,lo3p,lo4p,ri4p)
+		#pragma omp parallel for private(i, seei) //shared(c1p,c2p,c3p,c4p,xc1p,xc4p,yc1p,yc2p,xc2p,xc3p,yc3p,yc4p,xri1p,xup1p,xup2p,xle2p,xle3p,xlo3p,xlo4p,xri4p,yri1p,yup1p,yup2p,yle2p,yle3p,ylo3p,ylo4p,yri4p,ri1p,up1p,up2p,le2p,le3p,lo3p,lo4p,ri4p)
 		for(i=start+1; i<stop; i++){
 			seei=true;
 			xi=points->X[i];yi=points->Y[i];
@@ -651,19 +648,14 @@ void runEPSPDAC(pointSet *points){
 		#pragma omp barrier
 	}
 	
-	xc1=xc1p[0]; xc4=xc4p[0]; yc1=yc1p[0]; yc2=yc2p[0];
-	xc2=xc2p[0]; xc3=xc3p[0]; xc3=yc3p[0]; yc4=yc4p[0];
+	xc1=xc1p[0]; xc2=xc2p[0]; xc3=xc3p[0]; xc4=xc4p[0];
+	yc1=yc1p[0]; yc2=yc2p[0]; yc3=yc3p[0]; yc4=yc4p[0];
+	c1=c1p[0]; c2=c2p[0]; c3=c3p[0]; c4=c4p[0];
 	xri1=xri1p[0]; xup1=xup1p[0]; xup2=xup2p[0]; xle2=xle2p[0]; xle3=xle3p[0]; xlo3=xlo3p[0]; xlo4=xlo4p[0]; xri4=xri4p[0];
 	yri1=yri1p[0]; yup1=yup1p[0]; yup2=yup2p[0]; yle2=yle2p[0]; yle3=yle3p[0]; ylo3=ylo3p[0]; ylo4=ylo4p[0]; yri4=yri4p[0];
+	ri1=ri1p[0]; up1=up1p[0]; up2=up2p[0]; le2=le2p[0]; le3=le3p[0]; lo3=lo3p[0]; lo4=lo4p[0]; ri4=ri4p[0];
 	
-	//~ float xcentro, ycentro;
-	//~ if(points->NORMAL)
-		//~ xcentro = ycentro = points->mean;
-	//~ else{
-		//~ xcentro = (points->maxx + points->minx)/2;
-		//~ ycentro = (points->maxy + points->miny)/2;
-	//~ }
-	for(uint i=0; i<NTHREADS; i++)
+	for(uint i=1; i<NTHREADS; i++)
 	{
 		if(xle2p[i] < xle2){
 			xle2 = xle2p[i];
@@ -703,30 +695,40 @@ void runEPSPDAC(pointSet *points){
 		}
 		if(xri4p[i] > xri4){
 			xri4 = xri4p[i];
-			cout << "Paralelo: " << yri4p[i] << endl;
 			yri4 = yri4p[i];
 			ri4 = ri4p[i]; 
 		}
-		if(xc2p[i]-yc2p[i] < xc2-yc2){
-			c2 = c2p[i];
-			xc2 = xc2p[i];
-			yc2 = yc2p[i];
-		}
-		//NOT EQUAL
-		if(xc3p[i]+yc3p[i] < xc3+yc3){
-			c3 = c3p[i];
-			xc3 = xc3p[i];
-			yc3 = yc3p[i];
-		}
-		if(xc1p[i]+yc1p[i] > xc1+yc1){
+	}
+	
+	//Secondary extreme points
+	float d1, d1i, d2, d3, d4;
+	d1 = abs(xc1-xri1)+abs(yc1-yup1);
+	d2 = d3 = d4 = 0;
+	for(uint i=1; i<NTHREADS; i++){
+		d1i = abs(xc1p[i]-xri1)+abs(yc1p[i]-yup1);
+		if(xc1p[i]+yc1p[i] > xc1+yc1 && d1i < d1){
 			c1 = c1p[i];
 			xc1 = xc1p[i];
 			yc1 = yc1p[i];
+			d1 = xc1p[i]+yc1p[i];
 		}
-		if(yc4p[i]-xc4p[i] < xc4+yc4){
+		if(xc2p[i]-yc2p[i] < xle2-yup2 && d2 < xc2p[i]-yc2p[i]){
+			c2 = c2p[i];
+			xc2 = xc2p[i];
+			yc2 = yc2p[i];
+			d2 = xc2p[i]-yc2p[i];
+		}
+		if(xc3p[i]+yc3p[i] < xle3+ylo3 && d3 > xc3p[i]+yc3p[i]){
+			c3 = c3p[i];
+			xc3 = xc3p[i];
+			yc3 = yc3p[i];
+			d3 = xc3p[i]+yc3p[i];
+		}
+		if(yc4p[i]-xc4p[i] < ylo4-xri4 && d4 > yc4p[i]-xc4p[i]){
 			c4 = c4p[i];
 			xc4 = xc4p[i];
 			yc4 = yc4p[i];
+			d4 = yc4p[i]-xc4p[i];
 		}
 	}
 }
@@ -735,20 +737,24 @@ void runEPSPDAC(pointSet *points){
  * Cálculo de Puntos extremos en paralelo Reduction
  */
 void runEPSPReduce(pointSet *points){
-/*
+
+	ulong i;
 	c1 = c2 = c3 = c4 = points->n+1;
 	xc1 = xc4 = yc1 = yc2 = -1*FLT_MAX;
 	xc2 = xc3 = yc3 = yc4 = FLT_MAX;
 	xri1 = xup1 = xup2 = xle2 = xle3 = xlo3 = xlo4 = xri4 = points->X[0];
 	yri1 = yup1 = yup2 = yle2 = yle3 = ylo3 = ylo4 = yri4 = points->Y[0];
 	ri1 = up1 = up2 = le2 = le3 = lo3 = lo4 = ri4 = 0; 
+	//~ float dm1, dm2, dm3, dm4;
+	//dm1 = dm2 = dm3 = dm4 = 0;
 	#pragma omp parallel
 	{
 		float xi,yi;
 		bool seei=true;
-		#pragma omp parallel for private(i) reduction(max:xri1,yup1,yup2,xri4;min:xle2,xle3,ylo3,ylo4)
-		for(ulong i=1; i<n; i++, seei=true){
-			xi=poits->X[i];points->yi=Y[i];
+		#pragma omp parallel for private(i) reduction(max:xri1,yup1,yup2,xri4) reduction(min:xle2,xle3,ylo3,ylo4)
+		for(i=1; i<points->n; i++){
+			seei=true;
+			xi=points->X[i];yi=points->Y[i];
 			if(xi < xle2){
 				if (xc2-yc2 > xle2-yle2){
 					c2 = le2;
@@ -884,34 +890,40 @@ void runEPSPReduce(pointSet *points){
 				}
 
 			}
-
-			if (seei){
-				if (xc1+yc1 < xi+yi){
-					c1=i;
-					xc1=xi;
-					yc1=yi;
-				}else{
-					if (xc2-yc2 > xi-yi){
-						c2=i;
-						xc2=xi;
-						yc2=yi;
+			#pragma omp critical
+			{
+				if (seei){
+					if (xc1+yc1 < xi+yi){
+						//~ dm1 = xi+yi; // max
+						c1=i;
+						xc1=xi;
+						yc1=yi;
 					}else{
-						if (xc3+yc3 > xi+yi){
-							c3=i;
-							xc3=xi;
-							yc3=yi;
+						if (xc2-yc2 > xi-yi){
+							//~ dm2 = xi-yi; //min
+							c2=i;
+							xc2=xi;
+							yc2=yi;
 						}else{
-							if (yc4-xc4 > yi-xi){
-								c4=i;
-								xc4=xi;
-								yc4=yi;
+							if (xc3+yc3 > xi+yi){
+								//~ dm3 = xi+yi; //min
+								c3=i;
+								xc3=xi;
+								yc3=yi;
+							}else{
+								if (yc4-xc4 > yi-xi){
+									//~ dm4 = yi+xi; // min
+									c4=i;
+									xc4=xi;
+									yc4=yi;
+								}
 							}
 						}
 					}
 				}
 			}
 		}
-	}*/
+	}
 }
 
 /** 
@@ -1005,6 +1017,9 @@ void runEPSPReduce(pointSet *points){
  * Corregir
  */
  void testPoints(pointSet *points){
+	double t1, t2;
+	float avgTime;
+	ulong i;
 	float xup1s, xup2s, xle2s, xle3s, xlo3s, xlo4s, xri4s, xri1s;
 	float yup1s, yup2s, yle2s, yle3s, ylo3s, ylo4s, yri4s, yri1s;
 	float xc1s, xc2s, xc3s, xc4s;
@@ -1016,10 +1031,16 @@ void runEPSPReduce(pointSet *points){
 	ulong lo4s, ri4s;
 	ulong c1s, c2s, c3s, c4s;
 	
-	runEPS(points);
+	t1=omp_get_wtime(); 
+	for(i=0; i<REPET; i++){
+		runEPS(points);
+	}
+	t2=omp_get_wtime();
+	avgTime = (t2 - t1)/REPET;
+	cout << "Average CPU time per execution, Sequential = " << avgTime*1000000.0 << " Microseconds" << endl;
 	
 	xup1s=xup1; xup2s=xup2; xle2s=xle2; xle3s=xle3; xlo3s=xlo3; xlo4s=xlo4; xri4s=xri4; xri1s=xri1;
-	yup1s=yup1; yup2s=yup2; yle2s=yle2; yle3s=yle3; ylo3s=ylo3; ylo4s=ylo4; yri4s=xri4; yri1s=yri1;
+	yup1s=yup1; yup2s=yup2; yle2s=yle2; yle3s=yle3; ylo3s=ylo3; ylo4s=ylo4; yri4s=yri4; yri1s=yri1;
 	xc1s=xc1; xc2s=xc2; xc3s=xc3; xc4s=xc4;
 	yc1s=yc1; yc2s=yc2; yc3s=yc3; yc4s=yc4;
 	ri1s=ri1; up1s=up1;
@@ -1028,32 +1049,49 @@ void runEPSPReduce(pointSet *points){
 	lo4s=lo4; ri4s=ri4;
 	c1s=c1; c2s=c2; c3s=c3; c4s=c4;
 	
-	runEPSPDAC(points);
-	
-	if(xup1 != xup1s) cout << "ERROR, xup1 coordinates aren't equal" << endl;
-	if(yup1 != yup1s) cout << "ERROR, yup1 coordinates aren't equal" << endl;
-	if(xup2 != xup2s) cout << "ERROR, xup1 coordinates aren't equal" << endl;
-	if(yup2 != yup2s) cout << "ERROR, yup1 coordinates aren't equal" << endl;
-	if(xle2 != xle2s) cout << "ERROR, xle2 coordinates aren't equal" << endl;
-	if(yle2 != yle2s) cout << "ERROR, yle2 coordinates aren't equal" << endl;
-	if(xle3 != xle3s) cout << "ERROR, xle3 coordinates aren't equal" << endl;
-	if(yle3 != yle3s) cout << "ERROR, yle3 coordinates aren't equal" << endl;
-	if(xlo3 != xlo3s) cout << "ERROR, xlo3 coordinates aren't equal" << endl;
-	if(ylo3 != ylo3s) cout << "ERROR, ylo3 coordinates aren't equal" << endl;
-	if(xlo4 != xlo4s) cout << "ERROR, xlo4 coordinates aren't equal" << endl;
-	if(ylo4 != ylo4s) cout << "ERROR, ylo4 coordinates aren't equal" << endl;
-	if(xri4 != xri4s) cout << "ERROR, xri4 coordinates aren't equal" << endl;
-	if(yri4 != yri4s) cout << "ERROR, yri4 coordinates aren't equal" << endl;
-	if(xri1 != xri1s) cout << "ERROR, xri1 coordinates aren't equal" << endl;
-	if(yri1 != yri1s) cout << "ERROR, yri1 coordinates aren't equal" << endl;
-	if(xc1 != xc1s) cout << "ERROR, xc1 coordinates aren't equal" << endl;
-	if(yc1 != yc1s) cout << "ERROR, yc1 coordinates aren't equal" << endl;
-	if(xc2 != xc2s) cout << "ERROR, xc2 coordinates aren't equal" << endl;
-	if(yc2 != yc2s) cout << "ERROR, yc2 coordinates aren't equal" << endl;
-	if(xc3 != xc3s) cout << "ERROR, xc3 coordinates aren't equal" << endl;
-	if(yc3 != yc3s) cout << "ERROR, yc3 coordinates aren't equal" << endl;
-	if(xc4 != xc4s) cout << "ERROR, xc4 coordinates aren't equal" << endl;
-	if(yc4 != yc4s) cout << "ERROR, yc4 coordinates aren't equal" << endl;
-	
-	// FALTA COMPARAR ÍNDICES
+	t1=omp_get_wtime(); 
+	for(i=0; i<REPET; i++){
+		//~ runEPSPDAC(points);
+		runEPSPReduce(points);
+	}
+	t2=omp_get_wtime();
+	avgTime = (t2 - t1)/REPET;
+	cout << "Average CPU time per execution, Parallel = " << avgTime*1000000.0 << " Microseconds" << endl;
+
+	if(up1 != up1s) cout << "ERROR, up1: "<< up1s << " != " << up1 <<" The Indexes aren't equal" << endl;
+	if(up2 != up2s) cout << "ERROR, up2: "<< up2s << " != " << up2 <<" The Indexes aren't equal" << endl;
+	if(le2 != le2s) cout << "ERROR, le2: "<< le2s << " != " << le2 <<" The Indexes aren't equal" << endl;
+	if(le3 != le3s) cout << "ERROR, le3: "<< le3s << " != " << le3 <<" The Indexes aren't equal" << endl;
+	if(lo3 != lo3s) cout << "ERROR, lo3: "<< lo3s << " != " << lo3 <<" The Indexes aren't equal" << endl;
+	if(lo4 != lo4s) cout << "ERROR, lo4: "<< lo4s << " != " << lo4 <<" The Indexes aren't equal" << endl;
+	if(ri4 != ri4s) cout << "ERROR, ri4: "<< ri4s << " != " << ri4 <<" The Indexes aren't equal" << endl;
+	if(ri1 != ri1s) cout << "ERROR, ri1: "<< ri1s << " != " << ri1 <<" The Indexes aren't equal" << endl;
+	if(c1 != c1s) cout << "ERROR, c1: "<< c1s << " != " << c1 <<" The Indexes aren't equal" << endl;
+	if(c2 != c2s) cout << "ERROR, c2: "<< c2s << " != " << c2 <<" The Indexes aren't equal" << endl;
+	if(c3 != c3s) cout << "ERROR, c3: "<< c3s << " != " << c3 <<" The Indexes aren't equal" << endl;
+	if(c4 != c4s) cout << "ERROR, c4: "<< c4s << " != " << c4 <<" The Indexes aren't equal" << endl;
+	if(xup1 != xup1s) cout << "ERROR, xup1: "<< xup1s << " != " << xup1 <<" The Coordinates aren't equal" << endl;
+	if(yup1 != yup1s) cout << "ERROR, yup1: "<< yup1s << " != " << yup1 <<" The Coordinates aren't equal" << endl;
+	if(xup2 != xup2s) cout << "ERROR, xup2: "<< xup2s << " != " << xup2 <<" The Coordinates aren't equal" << endl;
+	if(yup2 != yup2s) cout << "ERROR, yup2: "<< yup2s << " != " << yup2 <<" The Coordinates aren't equal" << endl;
+	if(xle2 != xle2s) cout << "ERROR, xle2: "<< xle2s << " != " << xle2 <<" The Coordinates aren't equal" << endl;
+	if(yle2 != yle2s) cout << "ERROR, yle2: "<< yle2s << " != " << yle2 <<" The Coordinates aren't equal" << endl;
+	if(xle3 != xle3s) cout << "ERROR, xle3: "<< xle3s << " != " << xle3 <<" The Coordinates aren't equal" << endl;
+	if(yle3 != yle3s) cout << "ERROR, yle3: "<< yle3s << " != " << yle3 <<" The Coordinates aren't equal" << endl;
+	if(xlo3 != xlo3s) cout << "ERROR, xlo3: "<< xlo3s << " != " << xlo3 <<" The Coordinates aren't equal" << endl;
+	if(ylo3 != ylo3s) cout << "ERROR, ylo3: "<< ylo3s << " != " << ylo3 <<" The Coordinates aren't equal" << endl;
+	if(xlo4 != xlo4s) cout << "ERROR, xlo4: "<< xlo4s << " != " << xlo4 <<" The Coordinates aren't equal" << endl;
+	if(ylo4 != ylo4s) cout << "ERROR, ylo4: "<< ylo4s << " != " << ylo4 <<" The Coordinates aren't equal" << endl;
+	if(xri4 != xri4s) cout << "ERROR, xri4: "<< xri4s << " != " << xri4 <<" The Coordinates aren't equal" << endl;
+	if(yri4 != yri4s) cout << "ERROR, yri4: "<< yri4s << " != " << yri4 <<" The Coordinates aren't equal" << endl;
+	if(xri1 != xri1s) cout << "ERROR, xri1: "<< xri1s << " != " << xri1 <<" The Coordinates aren't equal" << endl;
+	if(yri1 != yri1s) cout << "ERROR, yri1: "<< yri1s << " != " << yri1 <<" The Coordinates aren't equal" << endl;
+	if(xc1 != xc1s) cout << "ERROR, xc1: "<< xc1s << " != " << xc1 <<" The Coordinates aren't equal" << endl;
+	if(yc1 != yc1s) cout << "ERROR, yc1: "<< yc1s << " != " << yc1 <<" The Coordinates aren't equal" << endl;
+	if(xc2 != xc2s) cout << "ERROR, xc2: "<< xc2s << " != " << xc2 <<" The Coordinates aren't equal" << endl;
+	if(yc2 != yc2s) cout << "ERROR, yc2: "<< yc2s << " != " << yc2 <<" The Coordinates aren't equal" << endl;
+	if(xc3 != xc3s) cout << "ERROR, xc3: "<< xc3s << " != " << xc3 <<" The Coordinates aren't equal" << endl;
+	if(yc3 != yc3s) cout << "ERROR, yc3: "<< yc3s << " != " << yc3 <<" The Coordinates aren't equal" << endl;
+	if(xc4 != xc4s) cout << "ERROR, xc4: "<< xc4s << " != " << xc4 <<" The Coordinates aren't equal" << endl;
+	if(yc4 != yc4s) cout << "ERROR, yc4: "<< yc4s << " != " << yc4 <<" The Coordinates aren't equal" << endl;
  }
