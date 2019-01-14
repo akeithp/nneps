@@ -24,7 +24,7 @@ using namespace std;
 //#define NTHREADS 4
 
 uint NTHREADS;	// number of threads
-ulong REPET = 1;
+ulong REPET = 10;
 
 float xup1, xup2, xle2, xle3, xlo3, xlo4, xri4, xri1;
 float yup1, yup2, yle2, yle3, ylo3, ylo4, yri4, yri1;
@@ -467,7 +467,7 @@ void runEPSPDAC(pointSet *points){
 		uint step, start, stop;
 		ulong i, j;
 		float xi,yi;
-		bool seei=true;
+		//~ bool seei=true;
 		step = (int)points->n/omp_get_num_threads();
 		id = omp_get_thread_num();
 		start = id * step;
@@ -479,7 +479,7 @@ void runEPSPDAC(pointSet *points){
 		xri1p[id] = xup1p[id] = xup2p[id] = xle2p[id] = xle3p[id] = xlo3p[id] = xlo4p[id] = xri4p[id] = points->X[start];
 		yri1p[id] = yup1p[id] = yup2p[id] = yle2p[id] = yle3p[id] = ylo3p[id] = ylo4p[id] = yri4p[id] = points->Y[start];
 		ri1p[id] = up1p[id] = up2p[id] = le2p[id] = le3p[id] = lo3p[id] = lo4p[id] = ri4p[id] = 0;
-		#pragma omp parallel for private(i, seei, xi, yi) shared(xri1p,xup1p,xup2p,xle2p,xle3p,xlo3p,xlo4p,xri4p,yri1p,yup1p,yup2p,yle2p,yle3p,ylo3p,ylo4p,yri4p,ri1p,up1p,up2p,le2p,le3p,lo3p,lo4p,ri4p)
+		#pragma omp parallel for private(i, xi, yi) shared(xri1p,xup1p,xup2p,xle2p,xle3p,xlo3p,xlo4p,xri4p,yri1p,yup1p,yup2p,yle2p,yle3p,ylo3p,ylo4p,yri4p,ri1p,up1p,up2p,le2p,le3p,lo3p,lo4p,ri4p)
 		for(i=start+1; i<stop; i++){
 			//~ seei=true;
 			xi=points->X[i];yi=points->Y[i];
@@ -572,13 +572,13 @@ void runEPSPDAC(pointSet *points){
 						xlo3p[id] = xi;
 						ylo3p[id] = yi;
 						lo3p[id] = i;
-						seei=false;
+						//~ seei=false;
 					}else{
 						if(xi > xlo4p[id]){
 							xlo4p[id] = xi;
 							ylo4p[id] = yi;
 							lo4p[id] = i;
-							seei=false;
+							//~ seei=false;
 						}
 					}
 				}else{
@@ -621,11 +621,11 @@ void runEPSPDAC(pointSet *points){
 		}
 		#pragma omp barrier
 		
+		xri1=xri1p[0]; xup1=xup1p[0]; xup2=xup2p[0]; xle2=xle2p[0]; xle3=xle3p[0]; xlo3=xlo3p[0]; xlo4=xlo4p[0]; xri4=xri4p[0];
+		yri1=yri1p[0]; yup1=yup1p[0]; yup2=yup2p[0]; yle2=yle2p[0]; yle3=yle3p[0]; ylo3=ylo3p[0]; ylo4=ylo4p[0]; yri4=yri4p[0];
+		ri1=ri1p[0]; up1=up1p[0]; up2=up2p[0]; le2=le2p[0]; le3=le3p[0]; lo3=lo3p[0]; lo4=lo4p[0]; ri4=ri4p[0];
 		#pragma omp critical
 		{
-			xri1=xri1p[0]; xup1=xup1p[0]; xup2=xup2p[0]; xle2=xle2p[0]; xle3=xle3p[0]; xlo3=xlo3p[0]; xlo4=xlo4p[0]; xri4=xri4p[0];
-			yri1=yri1p[0]; yup1=yup1p[0]; yup2=yup2p[0]; yle2=yle2p[0]; yle3=yle3p[0]; ylo3=ylo3p[0]; ylo4=ylo4p[0]; yri4=yri4p[0];
-			ri1=ri1p[0]; up1=up1p[0]; up2=up2p[0]; le2=le2p[0]; le3=le3p[0]; lo3=lo3p[0]; lo4=lo4p[0]; ri4=ri4p[0];
 			for(uint i=1; i<NTHREADS; i++)
 			{
 				if(xle2p[i] < xle2){
@@ -672,23 +672,20 @@ void runEPSPDAC(pointSet *points){
 			}
 		}
 		#pragma omp barrier
-	}
-	
-	#pragma omp parallel
-	{
-		uint id;
-		uint step, start, stop;
-		ulong j;
-		float xi,yi;
+
+		//~ uint id;
+		//~ uint step, start, stop;
+		//~ ulong j;
+		//~ float xi,yi;
 		//~ bool seei=true;
-		step = (int)points->n/omp_get_num_threads();
-		id = omp_get_thread_num();
-		start = id * step;
-		if (id != (NTHREADS-1))
-			stop = start + step;
-		else
-			stop = points->n;
-		c1p[id] = c2p[id] = c3p[id] = c4p[id] = step+1;
+		//~ step = (int)points->n/omp_get_num_threads();
+		//~ id = omp_get_thread_num();
+		//~ start = id * step;
+		//~ if (id != (NTHREADS-1))
+			//~ stop = start + step;
+		//~ else
+			//~ stop = points->n;
+		//~ c1p[id] = c2p[id] = c3p[id] = c4p[id] = step+1;
 		xc1p[id] = xc4p[id] = yc1p[id] = yc2p[id] = -1*FLT_MAX;
 		xc2p[id] = xc3p[id] = yc3p[id] = yc4p[id] = FLT_MAX;
 		#pragma omp parallel for private(j, xi, yi) shared(c1p, c2p, c3p, c4p)
@@ -723,7 +720,7 @@ void runEPSPDAC(pointSet *points){
 				}
 			}
 		}
-		#pragma omp barrier
+		//~ #pragma omp barrier
 
 		//~ c1=c1p[0]; c2=c2p[0]; c3=c3p[0]; c4=c4p[0];
 		#pragma omp critical
@@ -763,151 +760,190 @@ void runEPSPDAC(pointSet *points){
  */
 void runEPSPReduce(pointSet *points){
 
-	ulong i, j;
 	#pragma omp parallel 
 	{
+		ulong i, j;
 		xri1 = xup1 = xup2 = xle2 = xle3 = xlo3 = xlo4 = xri4 = points->X[0];
 		yri1 = yup1 = yup2 = yle2 = yle3 = ylo3 = ylo4 = yri4 = points->Y[0];
-		ri1 = up1 = up2 = le2 = le3 = lo3 = lo4 = ri4 = 0; 
-		float xi,yi;
-		#pragma omp parallel for private(i) reduction(max:xri1,yup1,yup2,xri4) reduction(min:xle2,xle3,ylo3,ylo4) //shared(c1,c2,c3,c4)
-		for(i=1; i<points->n; i++){
-			xi=points->X[i];yi=points->Y[i];
-			if(xi < xle2){
-				xle2 = xle3 = xi;
-				yle2 = yle3 = yi;
-				le2 = le3 = i;
-			}else{
-				if(xi == xle2){ 
-					if(yi > yle2){
-						le2 = i;
-						xle2 = xi;
-						yle2 = yi;
-					}else{
-						if(yi < yle3){
-							le3 = i;
-							xle3 = xi;
-							yle3 = yi;
-						}
-					}
-				}else{
-					if(xi > xri1){
-						ri1 = ri4 = i;
-						xri1 = xri4 = xi;
-						yri1 = yri4 = yi;
-					}else{
-						if(xi == xri1){
-							if(yi > yri1){
-								ri1 = i;
-								xri1 = xi;
-								yri1 = yi;
-							}else{
-								if(yi < yri4){
-									ri4 = i;
-									xri4 = xi;
-									yri4 = yi;
-								}
-							}
-						}
-					}
-				}
-			}
-			if(yi < ylo3){
-				xlo3 = xlo4 = xi;
-				ylo3 = ylo4 = yi;
-				lo3 = lo4 = i;
-			}else{
-				if(yi == ylo3){
-					if(xi < xlo3){
-						xlo3 = xi;
-						ylo3 = yi;
-						lo3 = i;
-					}else{
-						if(xi > xlo4){
-							xlo4 = xi;
-							ylo4 = yi;
-							lo4 = i;
-						}
-					}
-				}else{
-					if(yi > yup2){
-						xup2 = xup1 = xi;
-						yup2 = yup1 = yi;
-						up1 = up2 = i;
-					}else{
-						if(yi == yup2){
-							if(xi < xup2){
-								xup2 = xi;
-								yup2 = yi;
-								up2 = i;
-							}else{
-								if(xi > xup1){
-									xup1 = xi;
-									yup1 = yi;
-									up1 = i;
-								}
-							}
-						}
-					}
-				}
-
-			}
-		}
-				
-		c1 = c2 = c3 = c4 = points->n+1;
 		xc1 = xc4 = yc1 = yc2 = -1*FLT_MAX;
 		xc2 = xc3 = yc3 = yc4 = FLT_MAX;
+		//~ ri1 = up1 = up2 = le2 = le3 = lo3 = lo4 = ri4 = 0; 
 		float dm1, dm2, dm3, dm4;
-		dm1 =-1*FLT_MAX;
+		dm1 = -1*FLT_MAX;
 		dm2 = dm3 = dm4 = FLT_MAX;
-		dm2 = xc2-yc2;
-		float a1, b1, a2, b2, a3, b3, a4, b4;
-		b1 = (((yri1-yup1)*xup1)/(xri1-xup1)+yup1);
-		a1 = ((yri1-yup1)/(xri1-xup1));
-		a2 = (((yle2-yup2)*xup2)/(xle2-xup2)+yup2);
-		b2 = ((yle2-yup2)/(xle2-xup2));
-		#pragma omp barrier
-		#pragma omp parallel for private(j) reduction(max:dm1) reduction(min:dm2, dm3, dm4) //shared(a1, b1, a2, b2, a3, b3, a4, b4)
-		for(j=1; j<points->n; j++){
-			xi=points->X[j];yi=points->Y[j];
-			if(xi>xup1 && yi>yri1){
-				if(xi>((yi-b1)/a1) && yi > (a1*xi+b1)){
-					if (xc1+yc1 <= xi+yi){
-						dm1=xi+yi;
-						c1=j;
-						xc1=xi;
-						yc1=yi;
+		float xi,yi;
+		bool seei=true;
+		#pragma omp parallel for private(i) reduction(max:xri1,yup1,yup2,xri4,dm1) reduction(min:xle2,xle3,ylo3,ylo4,dm2,dm3,dm4) //shared(c1,c2,c3,c4)
+		for(i=1; i<points->n; i++){
+		seei = true;
+		xi=points->X[i];yi=points->Y[i];
+		if(xi < xle2){
+			if (xc2-yc2 > xle2-yle2){
+				c2 = le2;
+				xc2=xle2;
+				yc2=yle2;
+			}
+			if (xc3+yc3 > xle3+yle3){
+				c3 = le3;
+				xc3=xle3;
+				yc3=yle3;
+			}
+			xle2 = xle3 = xi;
+			yle2 = yle3 = yi;
+			le2 = le3 = i;
+			seei=false;
+		}else{
+			if(xi == xle2){ // no actualizar c2 o c3 pq tiene el mismo x q xi
+				if(yi > yle2){
+					le2 = i;
+					xle2 = xi;
+					yle2 = yi;
+					seei=false;
+				}else{
+					if(yi < yle3){
+						le3 = i;
+						xle3 = xi;
+						yle3 = yi;
+						seei=false;
 					}
 				}
-			}
-			if(xi<xup2 && yi>yle2){
-				if(xi<((yi-b2)/a2) && yi>(a2*xi+b2)){
-					if (dm2 >= xi-yi){
-						dm2=xi-yi;
-						c2=j;
-						xc2=xi;
-						yc2=yi;
+			}else{
+				if(xi > xri1){
+					if (xc1+yc1 < xri1+yri1){
+						c1 = ri1;
+						xc1=xri1;
+						yc1=yri1;
 					}
-				}
-			}
-			if(xi<xlo3 && yi<yle3){
-				if (xc3+yc3 >= xi+yi){
-					dm3=xi+yi;
-					c3=j;
-					xc3=xi;
-					yc3=yi;
-				}
-			}
-			if(xi>xlo4 && yi <yri4){
-				if (yc4-xc4 >= yi-xi){
-					dm4=yi-xi;
-					c4=j;
-					xc4=xi;
-					yc4=yi;
+					if (yc4-xc4 > yri4-xri4){
+						c4 = ri4;
+						xc4=xri4;
+						yc4=yri4;
+					}
+					ri1 = ri4 = i;
+					xri1 = xri4 = xi;
+					yri1 = yri4 = yi;
+					seei=false;
+				}else{
+					if(xi == xri1){
+						if(yi > yri1){
+							ri1 = i;
+							xri1 = xi;
+							yri1 = yi;
+							seei=false;
+						}else{
+							if(yi < yri4){
+								ri4 = i;
+								xri4 = xi;
+								yri4 = yi;
+								seei=false;
+							}
+						}
+					}
 				}
 			}
 		}
-		#pragma omp barrier
+
+
+		if(yi < ylo3){
+			if (xc3+yc3 > xlo3+ylo3){
+				xc3=xlo3;
+				yc3=ylo3;
+				c3 = lo3;
+			}
+			if (yc4-xc4 > ylo4-xlo4){
+				xc4=xlo4;
+				yc4=ylo4;
+				c4 = lo4;
+			}
+
+			xlo3 = xlo4 = xi;
+			ylo3 = ylo4 = yi;
+			lo3 = lo4 = i;
+			seei=false;
+		}else{
+			if(yi == ylo3){
+				if(xi < xlo3){
+					xlo3 = xi;
+					ylo3 = yi;
+					lo3 = i;
+					seei=false;
+				}else{
+					if(xi > xlo4){
+						xlo4 = xi;
+						ylo4 = yi;
+						lo4 = i;
+						seei=false;
+					}
+				}
+			}else{
+				if(yi > yup2){
+					if (xc1+yc1 < xup1+yup1){
+						xc1=xup1;
+						yc1=yup1;
+						c1 = up1;
+					}
+					if (xc2-yc2 > xup2-yup2){
+						xc2=xup2;
+						yc2=yup2;
+						c2 = up2;
+					}
+
+					xup2 = xup1 = xi;
+					yup2 = yup1 = yi;
+					up1 = up2 = i;
+					seei=false;
+				}else{
+					if(yi == yup2){
+						if(xi < xup2){
+							xup2 = xi;
+							yup2 = yi;
+							up2 = i;
+							seei=false;
+						}else{
+							if(xi > xup1){
+								xup1 = xi;
+								yup1 = yi;
+								up1 = i;
+								seei=false;
+							}
+						}
+					}
+				}
+			}
+
+		}
+
+		if (seei){
+			if (xc1+yc1 <= xi+yi){
+				dm1 = xi+yi;
+				c1=i;
+				xc1=xi;
+				yc1=yi;
+			}else{
+				if (xc2-yc2 >= xi-yi){
+					dm2=xi-yi;
+					c2=i;
+					xc2=xi;
+					yc2=yi;
+				}else{
+					if (xc3+yc3 >= xi+yi){
+						dm3=xi+yi;
+						c3=i;
+						xc3=xi;
+						yc3=yi;
+					}else{
+						if (yc4-xc4 >= yi-xi){
+							dm4=yi-xi;
+							c4=i;
+							xc4=xi;
+							yc4=yi;
+						}
+					}
+				}
+			}
+		}
+	}
+
 	}
 }
 
@@ -1056,7 +1092,9 @@ void runEPSPReduce(pointSet *points){
 	t2=omp_get_wtime();
 	avgTime = (t2 - t1)/REPET;
 	cout << "Average CPU time per execution, Parallel Reduction = " << avgTime*1000000.0 << " Microseconds" << endl;
-
+	
+	//~ runEPSPDAC(points);
+	
 	if(up1 != up1s) cout << "ERROR, up1: "<< up1s << " != " << up1 <<" The Indexes aren't equal" << endl;
 	if(up2 != up2s) cout << "ERROR, up2: "<< up2s << " != " << up2 <<" The Indexes aren't equal" << endl;
 	if(le2 != le2s) cout << "ERROR, le2: "<< le2s << " != " << le2 <<" The Indexes aren't equal" << endl;
