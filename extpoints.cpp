@@ -24,7 +24,7 @@ using namespace std;
 //#define NTHREADS 4
 
 uint NTHREADS;	// number of threads
-ulong REPET = 10;
+ulong REPET = 100;
 
 float xup1, xup2, xle2, xle3, xlo3, xlo4, xri4, xri1;
 float yup1, yup2, yle2, yle3, ylo3, ylo4, yri4, yri1;
@@ -110,7 +110,7 @@ int main(int argc, char const *argv[]){
 		
 	}
 	
-	// OJO: Corregir comprobación de parámetros de entrada y mensaje de error
+	// OJO: Cambiar comprobación de parámetros de entrada y mensaje de error
 	/*if(flagP && points->NORMAL && argc < 7){
 		cout << "Execution Error! call: ./prog <PARALLEL> <n> <NORMAL flag> [<mean>] [<sigma>] <threads> <REPETS FOR TEST" << endl;
 		exit(EXIT_FAILURE);
@@ -217,9 +217,6 @@ int main(int argc, char const *argv[]){
 				fprintf(fp, "%ld %f\n", points->n, (avgTime*1000000.0));
 			}
 			fclose(fp);
-			if(TEST){
-				testPoints(points);
-			}
 		}
 		if(TEST){
 			testPoints(points);
@@ -476,6 +473,7 @@ void runEPS(pointSet *points){
  * Búsqueda de puntos extremos en paralelo Divide and Conquer
  */
 void runEPSPDAC(pointSet *points){
+
 	float xup1p[NTHREADS], xup2p[NTHREADS], xle2p[NTHREADS], xle3p[NTHREADS], xlo3p[NTHREADS], xlo4p[NTHREADS], xri4p[NTHREADS], xri1p[NTHREADS];
 	float yup1p[NTHREADS], yup2p[NTHREADS], yle2p[NTHREADS], yle3p[NTHREADS], ylo3p[NTHREADS], ylo4p[NTHREADS], yri4p[NTHREADS], yri1p[NTHREADS];
 	float xc1p[NTHREADS], xc2p[NTHREADS], xc3p[NTHREADS], xc4p[NTHREADS];
@@ -485,7 +483,6 @@ void runEPSPDAC(pointSet *points){
 	ulong le3p[NTHREADS], lo3p[NTHREADS];
 	ulong lo4p[NTHREADS], ri4p[NTHREADS];
 	ulong c1p[NTHREADS], c2p[NTHREADS], c3p[NTHREADS], c4p[NTHREADS];
-
 	#pragma omp parallel
 	{
 		uint id;
@@ -717,7 +714,7 @@ void runEPSPDAC2(pointSet *points){
 	{
 		uint id;
 		uint step, start, stop;
-		ulong i, j;
+		ulong i;
 		float xi,yi;
 		bool seei;
 		float xup1p[NTHREADS], xup2p[NTHREADS], xle2p[NTHREADS], xle3p[NTHREADS], xlo3p[NTHREADS], xlo4p[NTHREADS], xri4p[NTHREADS], xri1p[NTHREADS];
@@ -971,14 +968,14 @@ void runEPSPDAC2(pointSet *points){
  */
 void runEPSPReduce(pointSet *points){
 
+	xri1 = xup1 = xup2 = xle2 = xle3 = xlo3 = xlo4 = xri4 = points->X[0];
+	yri1 = yup1 = yup2 = yle2 = yle3 = ylo3 = ylo4 = yri4 = points->Y[0];
+	xc1 = xc4 = yc1 = yc2 = -1*FLT_MAX;
+	xc2 = xc3 = yc3 = yc4 = FLT_MAX;
+	ri1 = up1 = up2 = le2 = le3 = lo3 = lo4 = ri4 = 0; 
 	#pragma omp parallel 
 	{
 		ulong i;
-		xri1 = xup1 = xup2 = xle2 = xle3 = xlo3 = xlo4 = xri4 = points->X[0];
-		yri1 = yup1 = yup2 = yle2 = yle3 = ylo3 = ylo4 = yri4 = points->Y[0];
-		xc1 = xc4 = yc1 = yc2 = -1*FLT_MAX;
-		xc2 = xc3 = yc3 = yc4 = FLT_MAX;
-		ri1 = up1 = up2 = le2 = le3 = lo3 = lo4 = ri4 = 0; 
 		float dm1, dm2, dm3, dm4;
 		dm1 = -1*FLT_MAX;
 		dm2 = dm3 = dm4 = FLT_MAX;
