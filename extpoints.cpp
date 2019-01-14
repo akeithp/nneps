@@ -98,12 +98,16 @@ int main(int argc, char const *argv[]){
 	 * @argv[6] number of threads
 	 */
 	if(flagP){
-		if(points->NORMAL) 
+		if(points->NORMAL){
 			NTHREADS = atoi(argv[6]);
-		else 
+			flagDR = atoi(argv[7]);
+		}
+		else{
 			NTHREADS = atoi(argv[8]);
+			flagDR = atoi(argv[9]);
+		}
 		omp_set_num_threads(NTHREADS);
-		flagDR = atoi(argv[9]);
+		
 	}
 	
 	// OJO: Corregir comprobación de parámetros de entrada y mensaje de error
