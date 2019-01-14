@@ -156,7 +156,7 @@ int main(int argc, char const *argv[]){
 		FILE *fp = fopen(aFile, "a+" );
 		if (points->NORMAL){
 			// [n] [avg eps-time/exec] [esperanza] [varianza]
-			fprintf(fp, "%ld %f %f %f\n", points->n, (avgTime*1000000.0), points->mean, points->sigma);
+			fprintf(fp, "%ld %f\n", points->n, (avgTime*1000000.0));
 		}else{
 			// [n] [nOcc] [avg bs-time/exec]
 			fprintf(fp, "%ld %f\n", points->n, (avgTime*1000000.0));
@@ -186,7 +186,7 @@ int main(int argc, char const *argv[]){
 			FILE *fp = fopen(aFile, "a+" );
 			if (points->NORMAL){
 				// [n] [avg epsP-time/exec] [esperanza] [varianza]
-				fprintf(fp, "%ld %f %f %f\n", points->n, (avgTime*1000000.0), points->mean, points->sigma);
+				fprintf(fp, "%ld %f\n", points->n, (avgTime*1000000.0));
 			}else{
 				// [n] [avg bs-time/exec]
 				fprintf(fp, "%ld %f\n", points->n, (avgTime*1000000.0));
@@ -211,7 +211,7 @@ int main(int argc, char const *argv[]){
 			FILE *fp = fopen(aFile, "a+" );
 			if (points->NORMAL){
 				// [n] [avg epsP-time/exec] [esperanza] [varianza]
-				fprintf(fp, "%ld %f %f %f\n", points->n, (avgTime*1000000.0), points->mean, points->sigma);
+				fprintf(fp, "%ld %f\n", points->n, (avgTime*1000000.0));
 			}else{
 				// [n] [avg bs-time/exec]
 				fprintf(fp, "%ld %f\n", points->n, (avgTime*1000000.0));
