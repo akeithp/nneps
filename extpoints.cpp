@@ -164,7 +164,7 @@ int main(int argc, char const *argv[]){
 	 * Parallel version
 	 */
 	 if(flagP){
-		 if(flagDR){
+		 if(!flagDR){
 			t1=omp_get_wtime(); 
 			for(i=0; i<REPET; i++){
 				runEPSPDAC(points);
